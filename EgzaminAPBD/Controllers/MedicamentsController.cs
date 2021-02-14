@@ -40,7 +40,14 @@ namespace EgzaminAPBD.Models
                         med.Description,
                         med.Type
                     },
-                    Recepty = pres.OrderBy(p => p.Date)
+                    Recepty = pres.OrderByDescending(p => p.Date).Select(p => new
+                    {
+                        p.IdPrescription,
+                        p.Date,
+                        p.DueDate,
+                        p.IdPatient,
+                        p.IdDoctor                        
+                    })
                 }) ;
             }
 
