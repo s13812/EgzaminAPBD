@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +12,39 @@ namespace EgzaminAPBD.Models
     [ApiController]
     public class MedicamentsController : ControllerBase
     {
-        //private readonly MedicineDbContext _context;
-        //public MedicamentsController(MedicineDbContext context)
-        //{
-        //    _context = context;
-        //}
+        private readonly MedicineDbContext _dbContext;
+        public MedicamentsController(MedicineDbContext context)
+        {
+            _dbContext = context;
+        }
 
-        [HttpGet("{IdMedicament}")]
+        [HttpGet("{idMedicament}")]
         public IActionResult GetMedicament(int idMedicament)
         {
-            return Ok(idMedicament);
+            var med = _dbContext.Medicaments.Where(m => m.IdMedicament == idMedicament).Include(m => m.PrescriptionMedicaments).FirstOrDefault();
+
+            if (med != null)
+            {
+                var pres = new List<Prescription>();
+
+                foreach (var pm in med.PrescriptionMedicaments)
+                {
+                    pres.Add(_dbContext.Prescriptions.First(p => p.IdPrescription == pm.IdPrescription));
+                }
+                return Ok(new
+                {
+                    Lek = new
+                    {
+                        med.IdMedicament,
+                        med.Name,
+                        med.Description,
+                        med.Type
+                    },
+                    Recepty = pres.OrderBy(p => p.Date)
+                }) ;
+            }
+
+            return NotFound("Nie ma takiego leku");
         }
 
     }

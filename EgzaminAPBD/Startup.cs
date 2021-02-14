@@ -26,10 +26,11 @@ namespace EgzaminAPBD
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<MedicineDbContext>(options =>
-            //{
-            //    options.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True");
-            //});
+            services.AddControllers().AddNewtonsoftJson(options =>
+                  options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
+
+            services.AddDbContext<MedicineDbContext>();
             services.AddControllers();
         }
 
